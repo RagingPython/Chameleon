@@ -16,6 +16,7 @@ public class FragmentControl implements ViewFacade {
 
     private FrgMenu frgMenu = new FrgMenu();
     private FrgNew frgNew = new FrgNew();
+    private FrgGame frgGame = new FrgGame();
 
     private FragmentManager fragmentManager;
     private CompositeDisposable disposables = new CompositeDisposable();
@@ -30,6 +31,7 @@ public class FragmentControl implements ViewFacade {
     public void setPresenter(PresenterFacade p){
         //TODO set more!
         frgMenu.setMenuState(p.getMenuState());
+        frgGame.setFieldState(p.getFieldState());
 
         //TODO Fragment switch:
         disposables.dispose();
@@ -46,6 +48,7 @@ public class FragmentControl implements ViewFacade {
                             t.replace(containerId, frgNew);
                             break;
                         case GAME:
+                            t.replace(containerId, frgGame);
                             break;
                         case WIN:
                             break;

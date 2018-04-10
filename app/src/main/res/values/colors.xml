@@ -3,4 +3,19 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="red">#d32f2f</color>
+    <color name="green">#388e3c</color>
+    <color name="blue">#0000F0</color>
+    <color name="yellow">#a3a305</color>
+    <color name="cyan">#00bcd4</color>
+
+
+    <array name="palette">
+        <item>@color/red</item>
+        <item>@color/green</item>
+        <item>@color/blue</item>
+        <item>@color/yellow</item>
+        <item>@color/cyan</item>
+    </array>
 </resources>
