@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/i_button_resume"
+        android:id="@+id/FrgMenuResume"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline" />
 
     <Button
-        android:id="@+id/i_button_new"
+        android:id="@+id/FrgMenuNew"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -31,10 +31,10 @@
         android:text="new game"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/i_button_resume" />
+        app:layout_constraintTop_toBottomOf="@+id/FrgMenuResume" />
 
     <Button
-        android:id="@+id/i_button_exit"
+        android:id="@+id/FrgMenuExit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -45,7 +45,7 @@
         android:text="exit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/i_button_new" />
+        app:layout_constraintTop_toBottomOf="@+id/FrgMenuNew" />
 
     <android.support.constraint.Guideline
         android:id="@+id/guideline"

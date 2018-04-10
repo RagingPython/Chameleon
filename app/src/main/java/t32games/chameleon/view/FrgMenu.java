@@ -20,7 +20,7 @@ import t32games.chameleon.presenter.MenuAction;
 import t32games.chameleon.presenter.MenuState;
 
 
-public class MenuFragment extends Fragment {
+public class FrgMenu extends Fragment {
 
     Button buttonNew, buttonResume, buttonExit;
 
@@ -47,10 +47,10 @@ public class MenuFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View ans = inflater.inflate(R.layout.fragment_menu, container);
-        buttonResume=ans.findViewById(R.id.i_button_resume);
-        buttonNew=ans.findViewById(R.id.i_button_new);
-        buttonExit=ans.findViewById(R.id.i_button_exit);
+        View ans = inflater.inflate(R.layout.frg_menu, container);
+        buttonResume=ans.findViewById(R.id.FrgMenuResume);
+        buttonNew=ans.findViewById(R.id.FrgMenuNew);
+        buttonExit=ans.findViewById(R.id.FrgMenuExit);
 
         internalDisposable.dispose();
         internalDisposable = new CompositeDisposable();

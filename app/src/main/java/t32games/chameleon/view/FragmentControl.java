@@ -1,12 +1,10 @@
 package t32games.chameleon.view;
 
-import android.app.FragmentController;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
-import t32games.chameleon.presenter.FragmentName;
 import t32games.chameleon.presenter.GameAction;
 import t32games.chameleon.presenter.MenuAction;
 import t32games.chameleon.presenter.NewAction;
@@ -15,7 +13,7 @@ import t32games.chameleon.presenter.ViewFacade;
 
 public class FragmentControl implements ViewFacade {
 
-    private MenuFragment menuFragment = new MenuFragment();
+    private FrgMenu frgMenu = new FrgMenu();
 
     private FragmentManager fragmentManager;
     private CompositeDisposable disposables = new CompositeDisposable();
@@ -29,7 +27,7 @@ public class FragmentControl implements ViewFacade {
 
     public void setPresenter(PresenterFacade p){
         //TODO set more!
-        menuFragment.setMenuState(p.getMenuState());
+        frgMenu.setMenuState(p.getMenuState());
 
         //TODO Fragment switch:
         disposables.dispose();
@@ -40,7 +38,7 @@ public class FragmentControl implements ViewFacade {
                     FragmentTransaction t = fragmentManager.beginTransaction();
                     switch (o) {
                         case MENU:
-                            t.add(containerId, menuFragment);
+                            t.add(containerId, frgMenu);
                             break;
                         case NEW:
                             break;
@@ -56,7 +54,7 @@ public class FragmentControl implements ViewFacade {
 
     @Override
     public Observable<MenuAction> getMenuActions() {
-        return menuFragment.getMenuAction();
+        return frgMenu.getMenuAction();
     }
 
     @Override
