@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.subjects.PublishSubject;
 import t32games.chameleon.presenter.GameAction;
 import t32games.chameleon.presenter.MenuAction;
 import t32games.chameleon.presenter.NewAction;
@@ -59,16 +60,16 @@ public class FragmentControl implements ViewFacade {
 
     @Override
     public Observable<GameAction> getGameActions() {
-        return null;
+        return PublishSubject.create();
     }
 
     @Override
     public Observable<NewAction> getNewActions() {
-        return null;
+        return PublishSubject.create();
     }
 
     @Override
     public Observable<Integer> getWinActions() {
-        return null;
+        return PublishSubject.create();
     }
 }
