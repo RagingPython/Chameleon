@@ -12,48 +12,43 @@ import com.jakewharton.rxbinding2.view.RxView;
 
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import t32games.chameleon.R;
-import t32games.chameleon.presenter.MenuAction;
-import t32games.chameleon.presenter.MenuState;
+import t32games.chameleon.presenter.NewAction;
+import t32games.chameleon.presenter.NewActionType;
 
-public class FrgNew extends Fragment {}
-/*
-    private final BehaviorSubject<MenuState> menuState= BehaviorSubject.create();
-    private final PublishSubject<MenuAction> menuAction = PublishSubject.create();
+public class FrgNew extends Fragment {
+
+    private final PublishSubject<NewAction> newAction = PublishSubject.create();
 
     private CompositeDisposable externalDisposable = new CompositeDisposable();
     private CompositeDisposable internalDisposable = new CompositeDisposable();
 
-    public Observable<MenuAction> getNewAction(){
-        return menuAction;
+    public Observable<NewAction> getNewAction(){
+        return newAction;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View ans = inflater.inflate(R.layout.frg_menu, container);
-        buttonResume=ans.findViewById(R.id.FrgMenuResume);
-        buttonNew=ans.findViewById(R.id.FrgMenuNew);
-        buttonExit=ans.findViewById(R.id.FrgMenuExit);
+        View ans = inflater.inflate(R.layout.frg_new, container);
+        Button buttonOnePlayer = ans.findViewById(R.id.FrgNewOnePlayer);
+        Button buttonTwoPlayers = ans.findViewById(R.id.FrgNewTwoPlayers);
+        Button buttonBack = ans.findViewById(R.id.FrgNewBack);
 
         internalDisposable.dispose();
         internalDisposable = new CompositeDisposable();
 
         internalDisposable.addAll(
-            RxView.clicks(buttonResume)
-                .map(o->MenuAction.RESUME)
-                .subscribe(menuAction::onNext)
-            , RxView.clicks(buttonNew)
-                .map(o->MenuAction.NEW)
-                .subscribe(menuAction::onNext)
-            , RxView.clicks(buttonExit)
-                .map(o->MenuAction.EXIT)
-                .subscribe(menuAction::onNext)
-            , menuState
-                .map(o->o==MenuState.RESUMABLE)
-                .subscribe(buttonResume::setEnabled)
+            RxView.clicks(buttonOnePlayer)
+                .map(o-> new NewAction(1,4, NewActionType.NEW))
+                .subscribe(newAction::onNext)
+            , RxView.clicks(buttonTwoPlayers)
+                .map(o-> new NewAction(2,4, NewActionType.NEW))
+                .subscribe(newAction::onNext)
+            , RxView.clicks(buttonBack)
+                .map(o-> new NewAction(0,0, NewActionType.BACK))
+                .subscribe(newAction::onNext)
         );
         return ans;
     }
@@ -69,4 +64,4 @@ public class FrgNew extends Fragment {}
         externalDisposable.dispose();
         super.finalize();
     }
-} */
+}

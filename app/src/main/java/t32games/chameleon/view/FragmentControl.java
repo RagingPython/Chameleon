@@ -15,6 +15,7 @@ import t32games.chameleon.presenter.ViewFacade;
 public class FragmentControl implements ViewFacade {
 
     private FrgMenu frgMenu = new FrgMenu();
+    private FrgNew frgNew = new FrgNew();
 
     private FragmentManager fragmentManager;
     private CompositeDisposable disposables = new CompositeDisposable();
@@ -42,6 +43,7 @@ public class FragmentControl implements ViewFacade {
                             t.replace(containerId, frgMenu);
                             break;
                         case NEW:
+                            t.replace(containerId, frgNew);
                             break;
                         case GAME:
                             break;
@@ -59,14 +61,10 @@ public class FragmentControl implements ViewFacade {
     }
 
     @Override
-    public Observable<GameAction> getGameActions() {
-        return PublishSubject.create();
-    }
+    public Observable<GameAction> getGameActions() { return PublishSubject.create(); }
 
     @Override
-    public Observable<NewAction> getNewActions() {
-        return PublishSubject.create();
-    }
+    public Observable<NewAction> getNewActions() { return frgNew.getNewAction();  }
 
     @Override
     public Observable<Integer> getWinActions() {
