@@ -47,7 +47,7 @@ public class FrgMenu extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View ans = inflater.inflate(R.layout.frg_menu, container);
+        View ans = inflater.inflate(R.layout.frg_menu, container, false);
         buttonResume=ans.findViewById(R.id.FrgMenuResume);
         buttonNew=ans.findViewById(R.id.FrgMenuNew);
         buttonExit=ans.findViewById(R.id.FrgMenuExit);
