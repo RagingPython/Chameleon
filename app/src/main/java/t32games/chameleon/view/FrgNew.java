@@ -31,7 +31,7 @@ public class FrgNew extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View ans = inflater.inflate(R.layout.frg_new, container);
+        View ans = inflater.inflate(R.layout.frg_new, container, false);
         Button buttonOnePlayer = ans.findViewById(R.id.FrgNewOnePlayer);
         Button buttonTwoPlayers = ans.findViewById(R.id.FrgNewTwoPlayers);
         Button buttonBack = ans.findViewById(R.id.FrgNewBack);
