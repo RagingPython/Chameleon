@@ -22,6 +22,13 @@ public class AcMain extends AppCompatActivity {
         p = new TestPresenter();
         fc = new FragmentControl(getFragmentManager(),R.id.AcMainContainer);
 
+        //fc.setPresenter(p);
+        //p.initialize(fc,m,null);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         fc.setPresenter(p);
         p.initialize(fc,m,null);
     }

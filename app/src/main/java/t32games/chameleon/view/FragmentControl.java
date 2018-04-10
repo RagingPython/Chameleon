@@ -39,7 +39,7 @@ public class FragmentControl implements ViewFacade {
                     FragmentTransaction t = fragmentManager.beginTransaction();
                     switch (o) {
                         case MENU:
-                            t.add(containerId, frgMenu);
+                            t.replace(containerId, frgMenu);
                             break;
                         case NEW:
                             break;
