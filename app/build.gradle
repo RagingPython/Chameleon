@@ -27,7 +27,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:26.+'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-    implementation group: 'io.reactivex.rxjava2', name: 'rxandroid', version: '2.0.2'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.9'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
     implementation 'com.jakewharton.rxbinding2:rxbinding:2.1.1'
 
 }
