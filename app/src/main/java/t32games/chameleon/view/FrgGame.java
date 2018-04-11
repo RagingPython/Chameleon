@@ -69,7 +69,7 @@ public class FrgGame extends Fragment {
         internalDisposable.addAll(
             panel1.getGameAction()
                 .subscribe(gameAction::onNext)
-            ,panel1.getGameAction()
+            ,panel2.getGameAction()
                 .subscribe(gameAction::onNext)
         );
         return ans;
