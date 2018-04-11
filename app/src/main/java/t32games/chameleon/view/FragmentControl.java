@@ -32,6 +32,7 @@ public class FragmentControl implements ViewFacade {
         //TODO set more!
         frgMenu.setMenuState(p.getMenuState());
         frgGame.setFieldState(p.getFieldState());
+        frgGame.setPlayerPanelState(p.getPlayerPanelState());
 
         //TODO Fragment switch:
         disposables.dispose();

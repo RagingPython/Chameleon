@@ -22,7 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
+    <t32games.chameleon.view.FrgGameViewPlayerPanel
         android:id="@+id/FrgGamePlayerPanel2"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -38,29 +38,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Button
-            android:id="@+id/button4"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="Button" />
+    </t32games.chameleon.view.FrgGameViewPlayerPanel>
 
-        <Button
-            android:id="@+id/button3"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="Button" />
-
-        <Button
-            android:id="@+id/button5"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="Button" />
-    </LinearLayout>
-
-    <LinearLayout
+    <t32games.chameleon.view.FrgGameViewPlayerPanel
         android:id="@+id/FrgGamePlayerPanel1"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -74,5 +54,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/FrgGameField"></LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/FrgGameField"></t32games.chameleon.view.FrgGameViewPlayerPanel>
 </android.support.constraint.ConstraintLayout>
