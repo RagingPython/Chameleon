@@ -66,7 +66,12 @@ public class FrgGame extends Fragment {
         panel2.setPlayer(1);
         panel1.setPlayerPanelState(playerPanelState);
         panel2.setPlayerPanelState(playerPanelState);
-
+        internalDisposable.addAll(
+            panel1.getGameAction()
+                .subscribe(gameAction::onNext)
+            ,panel1.getGameAction()
+                .subscribe(gameAction::onNext)
+        );
         return ans;
     }
 
@@ -76,7 +81,9 @@ public class FrgGame extends Fragment {
         super.onDestroyView();
     }
 
-
+    public Observable<GameAction> getGameAction(){
+        return gameAction;
+    }
 
     @Override
     protected void finalize() throws Throwable {

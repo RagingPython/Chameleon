@@ -6,12 +6,16 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.jakewharton.rxbinding2.view.RxView;
+
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 import t32games.chameleon.R;
 import t32games.chameleon.model.PlayerPanelState;
+import t32games.chameleon.presenter.GameAction;
+import t32games.chameleon.presenter.GameActionType;
 
 public class FrgGameViewPlayerPanel extends LinearLayout{
 
@@ -19,6 +23,7 @@ public class FrgGameViewPlayerPanel extends LinearLayout{
     private Disposable mainLink;
     private CompositeDisposable imageLinks = new CompositeDisposable();
     private Observable<PlayerPanelState> playerPanelState;
+    private PublishSubject<GameAction> gameAction =PublishSubject.create();
 
     public FrgGameViewPlayerPanel(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -31,6 +36,10 @@ public class FrgGameViewPlayerPanel extends LinearLayout{
 
     public void setPlayer(int player) {
         this.player = player;
+    }
+
+    public Observable<GameAction> getGameAction(){
+        return gameAction;
     }
 
     private void refill (int numberOfColors) {
@@ -54,6 +63,11 @@ public class FrgGameViewPlayerPanel extends LinearLayout{
                         return (o.getTurnOfPlayer() == player) & (!o.isBlocked(player, finalI))?VISIBLE:INVISIBLE;
                     })
                     .subscribe(imageView::setVisibility,Throwable::printStackTrace)
+            );
+            imageLinks.add(
+                RxView.clicks(imageView)
+                    .map(o->new GameAction(GameActionType.TURN,player,finalI))
+                    .subscribe(gameAction::onNext)
             );
             addView(imageView);
         }

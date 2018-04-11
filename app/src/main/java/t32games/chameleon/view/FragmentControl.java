@@ -65,7 +65,7 @@ public class FragmentControl implements ViewFacade {
     }
 
     @Override
-    public Observable<GameAction> getGameActions() { return PublishSubject.create(); }
+    public Observable<GameAction> getGameActions() { return frgGame.getGameAction(); }
 
     @Override
     public Observable<NewAction> getNewActions() { return frgNew.getNewAction();  }
