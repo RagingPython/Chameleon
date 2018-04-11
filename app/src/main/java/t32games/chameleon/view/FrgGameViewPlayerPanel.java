@@ -49,8 +49,11 @@ public class FrgGameViewPlayerPanel extends LinearLayout{
             imageLinks.add(
                 playerPanelState
                     .filter(o->o.getNumberOfColors()>finalI)
-                    .map(o-> (o.getTurnOfPlayer() == player) & (!o.isBlocked(player, finalI))?VISIBLE:INVISIBLE)
-                    .subscribe(imageView::setVisibility)
+                    .map(o-> {
+                        if ((!o.isTwoPlayers())&(player==1)) return INVISIBLE;
+                        return (o.getTurnOfPlayer() == player) & (!o.isBlocked(player, finalI))?VISIBLE:INVISIBLE;
+                    })
+                    .subscribe(imageView::setVisibility,Throwable::printStackTrace)
             );
             addView(imageView);
         }
