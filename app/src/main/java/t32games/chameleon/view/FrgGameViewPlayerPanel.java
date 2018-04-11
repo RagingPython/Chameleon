@@ -43,7 +43,7 @@ public class FrgGameViewPlayerPanel extends LinearLayout{
 
         for (int i =0;i<numberOfColors;i++) {
             ImageView imageView = new ImageView(getContext());
-            imageView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT));
+            imageView.setLayoutParams(new LayoutParams(100,100));
             imageView.setBackgroundColor(colors[i]);
             int finalI = i;
             imageLinks.add(
