@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.PublishSubject;
 import t32games.chameleon.presenter.GameAction;
@@ -30,15 +31,16 @@ public class FragmentControl implements ViewFacade {
 
     public void setPresenter(PresenterFacade p){
         //TODO set more!
-        frgMenu.setMenuState(p.getMenuState());
-        frgGame.setFieldState(p.getFieldState());
-        frgGame.setPlayerPanelState(p.getPlayerPanelState());
+        frgMenu.setMenuState(p.getMenuState().observeOn(AndroidSchedulers.mainThread()));
+        frgGame.setFieldState(p.getFieldState().observeOn(AndroidSchedulers.mainThread()));
+        frgGame.setPlayerPanelState(p.getPlayerPanelState().observeOn(AndroidSchedulers.mainThread()));
 
         //TODO Fragment switch:
         disposables.dispose();
         disposables = new CompositeDisposable();
         disposables.add(
             p.getFragmentControlState()
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(o->{
                     FragmentTransaction t = fragmentManager.beginTransaction();
                     switch (o) {

@@ -2,7 +2,10 @@ package t32games.chameleon.presenter;
 
 
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import t32games.chameleon.data.DataFacade;
@@ -59,10 +62,10 @@ public class TestPresenter implements PresenterFacade {
             , modelFacade.getPlayerPanelState().subscribe(playerPanelState::onNext)
             , modelFacade.getTimerState().subscribe(timerState::onNext)
             , modelFacade.getWinEvent().subscribe(winEvent::onNext)
-            , viewFacade.getMenuActions().subscribe(menuActions::onNext)
-            , viewFacade.getGameActions().subscribe(gameActions::onNext)
-            , viewFacade.getNewActions().subscribe(newActions::onNext)
-            , viewFacade.getWinActions().subscribe(winActions::onNext)
+            , viewFacade.getMenuActions().subscribeOn(Schedulers.computation()).subscribe(menuActions::onNext)
+            , viewFacade.getGameActions().subscribeOn(Schedulers.computation()).subscribe(gameActions::onNext)
+            , viewFacade.getNewActions().subscribeOn(Schedulers.computation()).subscribe(newActions::onNext)
+            , viewFacade.getWinActions().subscribeOn(Schedulers.computation()).subscribe(winActions::onNext)
         );
 
     }
