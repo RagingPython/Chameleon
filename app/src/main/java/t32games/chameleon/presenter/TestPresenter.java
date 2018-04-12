@@ -1,6 +1,13 @@
 package t32games.chameleon.presenter;
 
 
+import android.support.annotation.NonNull;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -39,7 +46,13 @@ public class TestPresenter implements PresenterFacade {
     private CompositeDisposable internalDisposables = new CompositeDisposable();
     private CompositeDisposable externalDisposables = new CompositeDisposable();
     //Internal state
-
+    Executor e = Executors.newSingleThreadExecutor();
+    private Scheduler s = Schedulers.from(Executors.newSingleThreadExecutor(new ThreadFactory() {
+        @Override
+        public Thread newThread(@NonNull Runnable runnable) {
+            return new Thread(new ThreadGroup("test"),runnable,"thread",50000);
+        }
+    }));
 
 
     public TestPresenter(){
@@ -62,10 +75,10 @@ public class TestPresenter implements PresenterFacade {
             , modelFacade.getPlayerPanelState().subscribe(playerPanelState::onNext)
             , modelFacade.getTimerState().subscribe(timerState::onNext)
             , modelFacade.getWinEvent().subscribe(winEvent::onNext)
-            , viewFacade.getMenuActions().subscribeOn(Schedulers.computation()).subscribe(menuActions::onNext)
-            , viewFacade.getGameActions().subscribeOn(Schedulers.computation()).subscribe(gameActions::onNext)
-            , viewFacade.getNewActions().subscribeOn(Schedulers.computation()).subscribe(newActions::onNext)
-            , viewFacade.getWinActions().subscribeOn(Schedulers.computation()).subscribe(winActions::onNext)
+            , viewFacade.getMenuActions().subscribeOn(s).subscribe(menuActions::onNext)
+            , viewFacade.getGameActions().subscribeOn(s).subscribe(gameActions::onNext)
+            , viewFacade.getNewActions().subscribeOn(s).subscribe(newActions::onNext)
+            , viewFacade.getWinActions().subscribeOn(s).subscribe(winActions::onNext)
         );
 
     }
