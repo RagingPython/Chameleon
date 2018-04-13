@@ -1,6 +1,8 @@
 package t32games.chameleon.model;
 
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
 import java.util.Random;
@@ -196,7 +198,6 @@ public class ModelState {
         }
 
         ms.allSameColorAs(new Pair<>(x,y), new ModelState(ms))
-            .doOnNext(System.out::println)
             .subscribe(o->ms.setColor(o,color));
         if(ms.twoPlayers) {
             ms.setTurnOfPlayer(1-ms.getTurnOfPlayer());
@@ -314,11 +315,12 @@ public class ModelState {
             PublishSubject<Pair<Integer,Integer>> ps = PublishSubject.create();
             Observable<Pair<Integer,Integer>> obs = ps.distinct();
             obs.subscribe(s::onNext);
+            Scheduler.Worker w = Schedulers.trampoline().createWorker();
             obs.subscribe(o->{
                 if (ms.getColor(o)==startColor){
                     allNearCells(o,ms)
                         .filter(oo->ms.getColor(oo)==startColor)
-                        .subscribe(ps::onNext);
+                        .subscribe(oo->w.schedule(()->ps.onNext(oo)));
                 }
             });
 

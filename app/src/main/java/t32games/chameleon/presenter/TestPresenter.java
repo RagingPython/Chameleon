@@ -75,10 +75,10 @@ public class TestPresenter implements PresenterFacade {
             , modelFacade.getPlayerPanelState().subscribe(playerPanelState::onNext)
             , modelFacade.getTimerState().subscribe(timerState::onNext)
             , modelFacade.getWinEvent().subscribe(winEvent::onNext)
-            , viewFacade.getMenuActions().observeOn(s).subscribe(menuActions::onNext)
-            , viewFacade.getGameActions().observeOn(s).subscribe(gameActions::onNext)
-            , viewFacade.getNewActions().observeOn(s).subscribe(newActions::onNext)
-            , viewFacade.getWinActions().observeOn(s).subscribe(winActions::onNext)
+            , viewFacade.getMenuActions().observeOn(Schedulers.io()).subscribe(menuActions::onNext)
+            , viewFacade.getGameActions().observeOn(Schedulers.io()).subscribe(gameActions::onNext)
+            , viewFacade.getNewActions().observeOn(Schedulers.io()).subscribe(newActions::onNext)
+            , viewFacade.getWinActions().observeOn(Schedulers.io()).subscribe(winActions::onNext)
         );
 
     }
