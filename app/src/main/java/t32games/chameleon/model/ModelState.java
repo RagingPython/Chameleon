@@ -241,12 +241,13 @@ public class ModelState {
             .flatMap(o->allNearCells(o,ms))
             .distinct()
             .subscribe(o-> {
-                visible[o.getKey()][o.getValue()] = true;
-                if (ms.getColor(o.getKey(),o.getValue())!=ms.getColor(0,0)){
+                if ((ms.getColor(o.getKey(),o.getValue())!=ms.getColor(0,0))&(!visible[o.getKey()][o.getValue()])){
                     allSameColorAs(o,ms)
                         .subscribe(oo->{
                             visible[oo.getKey()][oo.getValue()]=true;
                         });
+                } else {
+                    visible[o.getKey()][o.getValue()] = true;
                 }
             });
 
