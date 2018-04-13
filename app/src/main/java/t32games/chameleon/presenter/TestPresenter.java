@@ -50,7 +50,7 @@ public class TestPresenter implements PresenterFacade {
     private Scheduler s = Schedulers.from(Executors.newSingleThreadExecutor(new ThreadFactory() {
         @Override
         public Thread newThread(@NonNull Runnable runnable) {
-            return new Thread(new ThreadGroup("test"),runnable,"thread",50000);
+            return new Thread(new ThreadGroup("test"),runnable,"thread",100000);
         }
     }));
 
