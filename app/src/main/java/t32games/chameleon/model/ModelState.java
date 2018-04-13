@@ -254,12 +254,17 @@ public class ModelState {
 
         if(ms.isTwoPlayers()) {
             allSameColorAs(new Pair<>(X - 1, Y - 1), ms)
-                .flatMap(o -> allNearCells(o, ms))
+                .flatMap(o->allNearCells(o,ms))
                 .distinct()
-                .flatMap(o-> allSameColorAs(o,ms))
-                .distinct()
-                .subscribe(o -> {
-                    visible[o.getKey()][o.getValue()] = true;
+                .subscribe(o-> {
+                    if ((ms.getColor(o.getKey(),o.getValue())!=ms.getColor(X - 1, Y - 1))&(!visible[o.getKey()][o.getValue()])){
+                        allSameColorAs(o,ms)
+                            .subscribe(oo->{
+                                visible[oo.getKey()][oo.getValue()]=true;
+                            });
+                    } else {
+                        visible[o.getKey()][o.getValue()] = true;
+                    }
                 });
         };
         ms.setVisible(visible);
