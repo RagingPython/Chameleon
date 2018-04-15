@@ -4,11 +4,11 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="red">#d32f2f</color>
+    <color name="red">#a62424</color>
     <color name="green">#388e3c</color>
-    <color name="blue">#0000F0</color>
+    <color name="blue">#04047c</color>
     <color name="yellow">#a3a305</color>
-    <color name="cyan">#00bcd4</color>
+    <color name="cyan">#0ea1b7</color>
 
 
     <array name="palette">

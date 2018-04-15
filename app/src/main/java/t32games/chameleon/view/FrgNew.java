@@ -41,10 +41,10 @@ public class FrgNew extends Fragment {
 
         internalDisposable.addAll(
             RxView.clicks(buttonOnePlayer)
-                .map(o-> new NewAction(1,4, NewActionType.NEW))
+                .map(o-> new NewAction(1,5, NewActionType.NEW))
                 .subscribe(newAction::onNext)
             , RxView.clicks(buttonTwoPlayers)
-                .map(o-> new NewAction(2,4, NewActionType.NEW))
+                .map(o-> new NewAction(2,5, NewActionType.NEW))
                 .subscribe(newAction::onNext)
             , RxView.clicks(buttonBack)
                 .map(o-> new NewAction(0,0, NewActionType.BACK))

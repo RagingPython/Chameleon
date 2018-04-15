@@ -18,6 +18,7 @@ public class FragmentControl implements ViewFacade {
     private FrgMenu frgMenu = new FrgMenu();
     private FrgNew frgNew = new FrgNew();
     private FrgGame frgGame = new FrgGame();
+    private FrgWin frgWin = new FrgWin();
 
     private FragmentManager fragmentManager;
     private CompositeDisposable disposables = new CompositeDisposable();
@@ -34,6 +35,7 @@ public class FragmentControl implements ViewFacade {
         frgMenu.setMenuState(p.getMenuState().observeOn(AndroidSchedulers.mainThread()));
         frgGame.setFieldState(p.getFieldState().observeOn(AndroidSchedulers.mainThread()));
         frgGame.setPlayerPanelState(p.getPlayerPanelState().observeOn(AndroidSchedulers.mainThread()));
+        frgWin.setWinEvent(p.getWinState().observeOn(AndroidSchedulers.mainThread()));
 
         //TODO Fragment switch:
         disposables.dispose();
@@ -54,7 +56,7 @@ public class FragmentControl implements ViewFacade {
                             t.replace(containerId, frgGame);
                             break;
                         case WIN:
-                            break;
+                            t.replace(containerId, frgWin);
                     }
                     t.commit();
                 })
@@ -74,6 +76,6 @@ public class FragmentControl implements ViewFacade {
 
     @Override
     public Observable<Integer> getWinActions() {
-        return PublishSubject.create();
+        return frgWin.getWinAction();
     }
 }
