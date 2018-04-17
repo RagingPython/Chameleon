@@ -1,16 +1,15 @@
 package t32games.chameleon;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.ViewGroup;
+import android.support.v7.app.AppCompatActivity;
 
-import t32games.chameleon.model.TestModel;
-import t32games.chameleon.presenter.TestPresenter;
+import t32games.chameleon.model.Model;
+import t32games.chameleon.presenter.Presenter;
 import t32games.chameleon.view.FragmentControl;
 
 public class AcMain extends AppCompatActivity {
-    TestModel m;
-    TestPresenter p;
+    Model m;
+    Presenter p;
     FragmentControl fc;
 
     @Override
@@ -18,12 +17,9 @@ public class AcMain extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_main);
 
-        m = new TestModel();
-        p = new TestPresenter();
+        m = new Model();
+        p = new Presenter();
         fc = new FragmentControl(getFragmentManager(),R.id.AcMainContainer);
-
-        //fc.setPresenter(p);
-        //p.initialize(fc,m,null);
     }
 
     @Override

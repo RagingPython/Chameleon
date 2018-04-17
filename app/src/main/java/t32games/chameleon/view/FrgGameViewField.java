@@ -8,11 +8,11 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import t32games.chameleon.R;
-import t32games.chameleon.model.FieldState;
+import t32games.chameleon.model.FieldState_;
 
 public class FrgGameViewField extends View {
 
-    FieldState fieldState;
+    FieldState_ fieldState;
     Paint[] palette;
 
     public FrgGameViewField(Context context, AttributeSet attributeSet) {
@@ -25,7 +25,7 @@ public class FrgGameViewField extends View {
         }
     }
 
-    public void setFieldState(FieldState fieldState){
+    public void setFieldState(FieldState_ fieldState){
         this.fieldState=fieldState;
         this.invalidate();
     }

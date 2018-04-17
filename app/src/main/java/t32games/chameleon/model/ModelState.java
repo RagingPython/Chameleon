@@ -1,338 +1,215 @@
 package t32games.chameleon.model;
 
+import android.annotation.SuppressLint;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Random;
+
+
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 
-import java.util.Random;
-
-public class ModelState {
+public class ModelState implements SourceFieldState, SourcePlayerPanelState{
     private int xSize;
     private int ySize;
-    private boolean twoPlayers;
     private int numberOfColors;
-    private int timeLimit;
+    private boolean twoPlayers;
 
     private int turnOfPlayer;
-    private int[][] field;
-    private boolean[][] visible;
-    private boolean[][] blockedColors;
-    private boolean active;
-    private Observable<Integer> timer;
+    private LinkedList<Pair<Block,Block>> blockLinks;
+    private Block player0Block;
+    private Block player1Block;
 
-    private boolean immutable = false;
-
-    public ModelState(ModelState ms) {
-        this.xSize=ms.getXSize();
-        this.ySize=ms.getYSize();
-        this.twoPlayers=ms.isTwoPlayers();
-        this.numberOfColors=ms.getNumberOfColors();
-        this.timeLimit=ms.getTimeLimit();
-        this.turnOfPlayer=ms.getTurnOfPlayer();
-        this.field=ms.getField();
-        this.visible=ms.getVisible();
-        this.blockedColors=ms.getBlockedColors();
-        this.active=ms.isActive();
-        this.timer=ms.getTimer();
+    public ModelState(int xSize, int ySize, int numberOfColors, boolean twoPlayers, int turnOfPlayer, LinkedList<Pair<Block, Block>> blockLinks, Block player0Block, Block player1Block) {
+        this.xSize = xSize;
+        this.ySize = ySize;
+        this.numberOfColors = numberOfColors;
+        this.twoPlayers = twoPlayers;
+        this.turnOfPlayer = turnOfPlayer;
+        this.blockLinks = blockLinks;
+        this.player0Block = player0Block;
+        this.player1Block = player1Block;
     }
 
-    public ModelState(ModelCommandNew mcn){
-        this.xSize=mcn.getXSize();
-        this.ySize=mcn.getYSize();
-        this.twoPlayers=mcn.isTwoPlayers();
-        this.numberOfColors=mcn.getNumberOfColors();
-        this.timeLimit=mcn.getTimeLimit();
-        this.field = new int[0][0];
-        this.visible = new boolean[0][0];
-        this.blockedColors = new boolean[0][0];
+    @SuppressLint("CheckResult")
+    public static ModelState newGame(ModelCommandNew mcn){
+        int xSize = mcn.getXSize();
+        int ySize = mcn.getYSize();
+        int numberOfColors = mcn.getNumberOfColors();
+        boolean twoPlayers = mcn.isTwoPlayers();
+
+        int[][] newField= new int[xSize][ySize];
+        Block[][] newBlockField= new Block[xSize][ySize];
+        LinkedList<Pair<Block,Block>> newBlockLinks = new LinkedList<>();
+        Random r= new Random();
+        for(int i=0;i<xSize;i++){
+            for(int j=0;j<ySize;j++){
+                newField[i][j]=r.nextInt(numberOfColors);
+            }
+        }
+        for(int i=0;i<xSize;i++){
+            for(int j=0;j<ySize;j++){
+                if (newBlockField[i][j] == null) {
+                    Block newBlock = new Block(newField[i][j]);
+                    allSameColorAs(new Pair<>(i, j), newField)
+                        .subscribe(o->{
+                            newBlockField[o.getKey()][o.getValue()]=newBlock;
+                            newBlock.addCell(o);
+                        });
+                }
+            }
+        }
+        Block player0Block = newBlockField[0][0];
+        Block player1Block = newBlockField[xSize-1][ySize-1];
+        for(int i=0;i<xSize;i++){
+            for(int j=0;j<ySize;j++){
+                if (newBlockField[i][j] != null) {
+                    Block newBlock = newBlockField[i][j];
+                    allSameColorAs(new Pair<>(i, j), newField)
+                        .doOnNext(o->{
+                            if (newBlockField[o.getKey()][o.getValue()]==newBlock){
+                                newBlockField[o.getKey()][o.getValue()]=null;
+                        }})
+                        .flatMap(o->allNearCells(o,xSize,ySize))
+                        .filter(o->newBlockField[o.getKey()][o.getValue()]!=null)
+                        .map(o->newBlockField[o.getKey()][o.getValue()])
+                        .distinct()
+                        .subscribe(o-> newBlockLinks.add(new Pair<>(newBlock,o)));
+                }
+            }
+        }
+
+
+
+        return new ModelState(xSize,ySize,numberOfColors,twoPlayers,0,newBlockLinks,player0Block,player1Block);
     }
 
+    public ModelState makeTurn(int color){
+        //TODO: makeTurn
+
+        LinkedList<Pair<Block,Block>> newBlockLinks = new LinkedList<>();
+        Block currentBlock = turnOfPlayer ==0?player0Block:player1Block;
+        HashSet<Block> affectedBlocks = new HashSet<>();
+        Block newPlayer0Block, newPlayer1Block;
+        for (Pair<Block,Block> p:blockLinks){
+            if ((p.getKey()==currentBlock)|(p.getValue()==currentBlock)) {
+                if ((p.getKey() == currentBlock ? p.getValue() : p.getKey()).getColor()==color) {
+                    affectedBlocks.add(p.getKey() == currentBlock ? p.getValue() : p.getKey()); //TODO: RF minor
+                }
+            }
+        }
+        affectedBlocks.add(currentBlock);
+        currentBlock=new Block(color);
+        for(Block b:affectedBlocks){
+            currentBlock.mergeWith(b,color);
+        }
+        for (Pair<Block,Block> p:blockLinks){
+            if (affectedBlocks.contains(p.getKey())) {
+                if (!affectedBlocks.contains(p.getValue())) {
+                    newBlockLinks.add(new Pair<>(currentBlock,p.getValue()));
+                }
+            } else if (affectedBlocks.contains(p.getValue())){
+                newBlockLinks.add(new Pair<>(currentBlock,p.getKey()));
+            } else {
+                newBlockLinks.add(p);
+            }
+        }
+
+        if (turnOfPlayer ==0){
+            newPlayer0Block=currentBlock;
+            newPlayer1Block=player1Block;
+        } else {
+            newPlayer0Block=player0Block;
+            newPlayer1Block=currentBlock;
+        }
+
+        return new ModelState(xSize,ySize,numberOfColors, twoPlayers, twoPlayers ?1- turnOfPlayer : turnOfPlayer,newBlockLinks,newPlayer0Block,newPlayer1Block);
+    }
+
+
+    @Override
     public int getXSize() {
         return xSize;
     }
 
+    @Override
     public int getYSize() {
         return ySize;
     }
 
+    @Override
+    public Observable<SourceCellState> getVisibleCells() {
+        return Observable.fromIterable(blockLinks)
+            .filter(o->(o.getKey()==player0Block)|(o.getKey()==player1Block)|(o.getValue()==player0Block)|(o.getValue()==player1Block))
+            .flatMap(o->Observable.just(o.getKey(),o.getValue()))
+            .distinct()
+            .flatMap(Block::getCells);
+    }
+
+    @Override
     public boolean isTwoPlayers() {
         return twoPlayers;
     }
 
-    public int getNumberOfColors() {
-        return numberOfColors;
+    @Override
+    public Observable<Integer> getAllowedColors(int player) {
+        return Observable.fromIterable(blockLinks)
+            .filter(o->player==turnOfPlayer)
+            .filter(o->(o.getKey()==(player==0?player0Block:player1Block))|(o.getValue()==(player==0?player0Block:player1Block)))
+            .flatMap(o->Observable.just(o.getKey(),o.getValue()))
+            .map(Block::getColor)
+            .distinct()
+            .filter(o->(o!=player0Block.getColor())&(o!=player1Block.getColor()));
     }
 
-    public int getTimeLimit() {
-        return timeLimit;
+    @Override
+    public int getNumberOfColors() {
+        return numberOfColors;
     }
 
     public int getTurnOfPlayer() {
         return turnOfPlayer;
     }
 
-    public int[][] getField() {
-        int[][] ans = field.clone();
-        for(int i=0; i<ans.length; i++){
-            ans[i]= field[i].clone();
-        }
-        return ans;
+    public WinEvent getWinEvent(){
+        int[] score = new int[2];
+        score[0] = player0Block.getCells().count().blockingGet().intValue();
+        score[1] = player1Block.getCells().count().blockingGet().intValue();
+        return new WinEvent(twoPlayers, score, twoPlayers&(score[0]<score[1])?1:0);
     }
 
-    public boolean[][] getVisible() {
-        boolean[][] ans = visible.clone();
-        for(int i=0; i<ans.length; i++){
-            ans[i]=visible[i].clone();
-        }
-        return ans;
-    }
-
-    public boolean[][] getBlockedColors() {
-        boolean[][] ans = blockedColors.clone();
-        for(int i=0; i<ans.length; i++){
-            ans[i]=blockedColors[i].clone();
-        }
-        return ans;
-    }
-
-    public int getColor(int x, int y){
-        return field[x][y];
-    }
-
-    public int getColor(Pair<Integer,Integer> xy){
-        return field[xy.getKey()][xy.getValue()];
-    }
-
-    public boolean isVisible(int x, int y){
-        return visible[x][y];
-    }
-
-    public boolean isVisible(Pair<Integer,Integer> xy){
-        return visible[xy.getKey()][xy.getValue()];
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public Observable<Integer> getTimer() {
-        return timer;
-    }
-
-    public void setXSize(int xSize) {
-        if(!immutable) this.xSize = xSize;
-    }
-
-    public void setYSize(int ySize) {
-        if(!immutable) this.ySize = ySize;
-    }
-
-    public void setTwoPlayers(boolean twoPlayers) {
-        if(!immutable) this.twoPlayers = twoPlayers;
-    }
-
-    public void setNumberOfColors(int numberOfColors) {
-        if(!immutable) this.numberOfColors = numberOfColors;
-    }
-
-    public void setTimeLimit(int timeLimit) {
-        if(!immutable) this.timeLimit = timeLimit;
-    }
-
-    public void setTurnOfPlayer(int turnOfPlayer) {
-        if(!immutable) this.turnOfPlayer = turnOfPlayer;
-    }
-
-    public void setField(int[][] field) {
-        if(!immutable) this.field = field;
-    }
-
-    public void setVisible(boolean[][] visible) {
-        if(!immutable) this.visible = visible;
-    }
-
-    public void setBlockedColors(boolean[][] blockedColors) {
-        if(!immutable) this.blockedColors = blockedColors;
-    }
-
-    public void setColor(int x, int y, int color) {
-        if(!immutable) field[x][y]=color;
-    }
-
-    public void setColor(Pair<Integer,Integer> xy, int color) {
-        if(!immutable) field[xy.getKey()][xy.getValue()]=color;
-    }
-
-    public void setVisible(int x, int y, boolean v) {
-        if(!immutable) visible[x][y]=v;
-    }
-
-    public void setVisible(Pair<Integer,Integer> xy, boolean v) {
-        if(!immutable) visible[xy.getKey()][xy.getValue()]=v;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public void setTimer(Observable<Integer> timer) {
-        this.timer = timer;
-    }
-
-    public ModelState makeImmutable(){
-        immutable=true;
-        return this;
-    }
-    ///LOGIC
-
-    public ModelState makeTurn(int color){
-        //TODO make turn
-        ModelState ms = new ModelState(this);
-        int x=0;
-        int y=0;
-
-        if (ms.getTurnOfPlayer()==1) {
-            x=ms.getXSize()-1;
-            y=ms.getYSize()-1;
-        }
-
-        ms.allSameColorAs(new Pair<>(x,y), new ModelState(ms))
-            .subscribe(o->ms.setColor(o,color));
-        if(ms.twoPlayers) {
-            ms.setTurnOfPlayer(1-ms.getTurnOfPlayer());
-        }
-
-        return ms.updateVisible();
-    }
-
-    public ModelState newGame(){
-        ModelState ms = new ModelState(this);
-        Random random = new Random();
-        int X = ms.getXSize();
-        int Y = ms.getYSize();
-        int[][] field = new int[X][Y];
-        boolean[][] visible = new boolean[X][Y];
-        for (int i = 0;i<X;i++){
-            for (int j = 0;j<Y;j++){
-                field[i][j]= random.nextInt(ms.getNumberOfColors());
-            }
-        }
-        ms.setField(field);
-        ms.setActive(true);
-        ms.setTurnOfPlayer(0);
-        return ms.updateVisible();
-    }
-
-    public WinEvent checkWin(){
-        //TODO checkWin
-        return null;
-    }
-
-    public ModelState updateVisible(){
-        ModelState ms = new ModelState(this);
-        int X = ms.getXSize();
-        int Y = ms.getYSize();
-        boolean[][] visible = new boolean[X][Y];
-
-        Observable<Pair<Integer,Integer>> tmp;
-
-        allSameColorAs(new Pair<>(0,0), ms)
-            .flatMap(o->allNearCells(o,ms))
-            .distinct()
-            .subscribe(o-> {
-                if ((ms.getColor(o.getKey(),o.getValue())!=ms.getColor(0,0))&(!visible[o.getKey()][o.getValue()])){
-                    allSameColorAs(o,ms)
-                        .subscribe(oo->{
-                            visible[oo.getKey()][oo.getValue()]=true;
-                        });
-                } else {
-                    visible[o.getKey()][o.getValue()] = true;
-                }
-            });
-
-
-        if(ms.isTwoPlayers()) {
-            allSameColorAs(new Pair<>(X - 1, Y - 1), ms)
-                .flatMap(o->allNearCells(o,ms))
-                .distinct()
-                .subscribe(o-> {
-                    if ((ms.getColor(o.getKey(),o.getValue())!=ms.getColor(X - 1, Y - 1))&(!visible[o.getKey()][o.getValue()])){
-                        allSameColorAs(o,ms)
-                            .subscribe(oo->{
-                                visible[oo.getKey()][oo.getValue()]=true;
-                            });
-                    } else {
-                        visible[o.getKey()][o.getValue()] = true;
-                    }
-                });
-        };
-        ms.setVisible(visible);
-        return ms.updateBlockedColors();
-    }
-
-    public ModelState updateBlockedColors(){
-        ModelState ms = new ModelState(this);
-        boolean[][] bc = new boolean[ms.getNumberOfColors()][ms.isTwoPlayers()?2:1];
-
-        for (int i = 0; i<(ms.isTwoPlayers()?2:1);i++){
-            for (int j = 0; j<(ms.getNumberOfColors());j++){
-                bc[j][i]=true;
-            }
-        }
-
-        allSameColorAs(new Pair<>(0,0),ms)
-            .flatMap(o->allNearCells(o,ms))
-            .map(ms::getColor)
-            .distinct()
-            .subscribe(o->bc[o][0]=false);
-        bc[ms.getColor(0,0)][0]=true;
-
-        if (ms.isTwoPlayers()) {
-            allSameColorAs(new Pair<>(ms.getXSize()-1,ms.getYSize()-1),ms)
-                .flatMap(o->allNearCells(o,ms))
-                .map(ms::getColor)
-                .distinct()
-                .subscribe(o->bc[o][1]=false);
-            bc[ms.getColor(ms.getXSize()-1,ms.getYSize()-1)][0]=true;
-            bc[ms.getColor(ms.getXSize()-1,ms.getYSize()-1)][1]=true;
-            bc[ms.getColor(0,0)][1]=true;
-            boolean b = true;
-            for (int i= 0; i<ms.getNumberOfColors(); i++) b=b&bc[i][ms.getTurnOfPlayer()];
-            if (b) ms.setTurnOfPlayer(1-ms.getTurnOfPlayer());
-        }
-        ms.setBlockedColors(bc);
-        return ms;
-    }
-
-    private Observable<Pair<Integer,Integer>> allNearCells(Pair<Integer,Integer> xy, ModelState ms){
+    private static Observable<Pair<Integer,Integer>> allNearCells(Pair<Integer,Integer> xy, int xSize, int ySize){
         int x= xy.getKey();
         int y= xy.getValue();
         return Observable.create(s->{
-            if ((x>=0)&(y>=0)&(x<ms.getXSize())&(y<ms.getYSize())){
+            if ((x>=0)&(y>=0)&(x<xSize)&(y<ySize)){
                 s.onNext(new Pair<>(x,y));
                 if(x-1>=0) s.onNext(new Pair<>(x-1,y));
-                if(x+1<ms.getXSize()) s.onNext(new Pair<>(x+1,y));
+                if(x+1<xSize) s.onNext(new Pair<>(x+1,y));
                 if(y-1>=0) s.onNext(new Pair<>(x,y-1));
-                if(y+1<ms.getYSize()) s.onNext(new Pair<>(x,y+1));
+                if(y+1<ySize) s.onNext(new Pair<>(x,y+1));
             }
             s.onComplete();
         });
     }
 
-    private Observable<Pair<Integer,Integer>> allSameColorAs(Pair<Integer,Integer> xy, ModelState ms){
+    @SuppressLint("CheckResult")
+    private static Observable<Pair<Integer,Integer>> allSameColorAs(Pair<Integer,Integer> xy, int[][] colors){
         int x = xy.getKey();
         int y = xy.getValue();
         return Observable.create(s->{
-            int startColor=ms.getColor(x,y);
+            int startColor=colors[x][y];
             PublishSubject<Pair<Integer,Integer>> ps = PublishSubject.create();
             Observable<Pair<Integer,Integer>> obs = ps.distinct();
             obs.subscribe(s::onNext);
             Scheduler.Worker w = Schedulers.trampoline().createWorker();
             obs.subscribe(o->{
-                if (ms.getColor(o)==startColor){
-                    allNearCells(o,ms)
-                        .filter(oo->ms.getColor(oo)==startColor)
+                if (colors[o.getKey()][o.getValue()]==startColor){
+                    allNearCells(o,colors.length,colors[0].length)
+                        .filter(oo->colors[oo.getKey()][oo.getValue()]==startColor)
                         .subscribe(oo->w.schedule(()->ps.onNext(oo)));
                 }
             });
@@ -341,19 +218,5 @@ public class ModelState {
             ps.onComplete();
             s.onComplete();
         });
-    }
-
-    public WinEvent getWinEvent(){
-
-        int[] score = new int[2];
-        allSameColorAs(new Pair<>(0,0),this)
-            .count()
-            .subscribe(o->score[0]=o.intValue());
-        Pair<Integer,Integer> p =new Pair<>(getXSize()-1,getYSize()-1);
-        allSameColorAs(p,this)
-            .count()
-            .subscribe(o->score[1]=o.intValue());
-        int winner = isTwoPlayers()&(score[1]>score[0])?1:0;
-        return new WinEvent(isTwoPlayers(), score, winner);
     }
 }

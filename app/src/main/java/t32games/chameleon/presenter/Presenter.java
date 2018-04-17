@@ -1,39 +1,29 @@
 package t32games.chameleon.presenter;
 
 
-import android.support.annotation.NonNull;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
 import io.reactivex.Observable;
-import io.reactivex.Scheduler;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import t32games.chameleon.data.DataFacade;
-import t32games.chameleon.model.FieldState;
 import t32games.chameleon.model.ModelCommand;
 import t32games.chameleon.model.ModelCommandNew;
-import t32games.chameleon.model.ModelCommandPauseResume;
 import t32games.chameleon.model.ModelCommandTurn;
 import t32games.chameleon.model.ModelFacade;
 import t32games.chameleon.model.Pair;
-import t32games.chameleon.model.PlayerPanelState;
+import t32games.chameleon.model.SourceFieldState;
+import t32games.chameleon.model.SourcePlayerPanelState;
 import t32games.chameleon.model.WinEvent;
 
 
-public class TestPresenter implements PresenterFacade {
+public class Presenter implements PresenterFacade {
     //OUT Streams
     private BehaviorSubject<FragmentName> fragmentControlState = BehaviorSubject.createDefault(FragmentName.MENU);
     private BehaviorSubject<MenuState> menuState = BehaviorSubject.createDefault(MenuState.UNRESUMABLE);
-    private BehaviorSubject<FieldState> fieldState = BehaviorSubject.create();
+    private BehaviorSubject<SourceFieldState> fieldState = BehaviorSubject.create();
     private BehaviorSubject<Integer> timerState = BehaviorSubject.create();
-    private BehaviorSubject<PlayerPanelState> playerPanelState = BehaviorSubject.create();
+    private BehaviorSubject<SourcePlayerPanelState> playerPanelState = BehaviorSubject.create();
     private PublishSubject<ModelCommand> modelCommand = PublishSubject.create();
     private BehaviorSubject<WinEvent> winState = BehaviorSubject.create();
     //IN Streams
@@ -46,16 +36,9 @@ public class TestPresenter implements PresenterFacade {
     private CompositeDisposable internalDisposables = new CompositeDisposable();
     private CompositeDisposable externalDisposables = new CompositeDisposable();
     //Internal state
-    Executor e = Executors.newSingleThreadExecutor();
-    private Scheduler s = Schedulers.from(Executors.newSingleThreadExecutor(new ThreadFactory() {
-        @Override
-        public Thread newThread(@NonNull Runnable runnable) {
-            return new Thread(new ThreadGroup("test"),runnable,"thread",100000);
-        }
-    }));
 
 
-    public TestPresenter(){
+    public Presenter(){
 
         createLogic();
 
@@ -73,7 +56,6 @@ public class TestPresenter implements PresenterFacade {
         externalDisposables.addAll(
             modelFacade.getFieldState().subscribe(fieldState::onNext)
             , modelFacade.getPlayerPanelState().subscribe(playerPanelState::onNext)
-            , modelFacade.getTimerState().subscribe(timerState::onNext)
             , modelFacade.getWinEvent().subscribe(winEvent::onNext)
             , viewFacade.getMenuActions().observeOn(Schedulers.io()).subscribe(menuActions::onNext)
             , viewFacade.getGameActions().observeOn(Schedulers.io()).subscribe(gameActions::onNext)
@@ -125,7 +107,7 @@ public class TestPresenter implements PresenterFacade {
                 .map(Pair::getKey)
                 .subscribe(o->{
                     fragmentControlState.onNext(FragmentName.GAME);
-                    modelCommand.onNext(new ModelCommandNew(30,30,o.getPlayers()==2,o.getColors(),10));
+                    modelCommand.onNext(new ModelCommandNew(30,30,o.getPlayers()==2,o.getColors()));
                 })
         );
         //GAME->BACK
@@ -153,11 +135,6 @@ public class TestPresenter implements PresenterFacade {
                 .filter(o->o.getValue()==FragmentName.WIN)
                 .map(Pair::getKey)
                 .subscribe(o->fragmentControlState.onNext(FragmentName.MENU))
-        );
-        //GAME PAUSE/RESUME
-        internalDisposables.add(
-            fragmentControlState
-                .subscribe(o->modelCommand.onNext(new ModelCommandPauseResume(o==FragmentName.GAME)))
         );
         //MENU STATE
         internalDisposables.add(
@@ -195,17 +172,12 @@ public class TestPresenter implements PresenterFacade {
     }
 
     @Override
-    public Observable<FieldState> getFieldState() {
+    public Observable<SourceFieldState> getFieldState() {
         return fieldState;
     }
 
     @Override
-    public BehaviorSubject<Integer> getTimerState() {
-        return timerState;
-    }
-
-    @Override
-    public Observable<PlayerPanelState> getPlayerPanelState() {
+    public Observable<SourcePlayerPanelState> getPlayerPanelState() {
         return playerPanelState;
     }
 

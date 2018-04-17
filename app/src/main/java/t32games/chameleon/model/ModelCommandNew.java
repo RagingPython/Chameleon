@@ -7,7 +7,7 @@ public class ModelCommandNew extends ModelCommand {
     private int numberOfColors;
     private int timeLimit;
 
-    public ModelCommandNew(int xSize, int ySize, boolean twoPlayers, int numberOfColors, int timeLimit) {
+    public ModelCommandNew(int xSize, int ySize, boolean twoPlayers, int numberOfColors) {
         this.xSize = xSize;
         this.ySize = ySize;
         this.twoPlayers = twoPlayers;
