@@ -13,15 +13,15 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import t32games.chameleon.R;
-import t32games.chameleon.model.FieldState_;
-import t32games.chameleon.model.PlayerPanelState;
+import t32games.chameleon.model.SourceFieldState;
+import t32games.chameleon.model.SourcePlayerPanelState;
 import t32games.chameleon.presenter.GameAction;
 
 public class FrgGame extends Fragment {
 
 
-    private final BehaviorSubject<FieldState_> fieldState = BehaviorSubject.create();
-    private final BehaviorSubject<PlayerPanelState> playerPanelState = BehaviorSubject.create();
+    private final BehaviorSubject<SourceFieldState> fieldState = BehaviorSubject.create();
+    private final BehaviorSubject<SourcePlayerPanelState> playerPanelState = BehaviorSubject.create();
 
 
     private final PublishSubject<GameAction> gameAction = PublishSubject.create();
@@ -29,14 +29,14 @@ public class FrgGame extends Fragment {
     private CompositeDisposable internalDisposable = new CompositeDisposable();
     private Disposable fieldStateLink, playerPanelStateLink;
 
-    public void setFieldState(Observable<FieldState_> fieldState) {
+    public void setFieldState(Observable<SourceFieldState> fieldState) {
         if (fieldStateLink!=null) fieldStateLink.dispose();
         fieldStateLink = fieldState
                 .subscribe(this.fieldState::onNext);
 
     }
 
-    public void setPlayerPanelState(Observable<PlayerPanelState> playerPanelState) {
+    public void setPlayerPanelState(Observable<SourcePlayerPanelState> playerPanelState) {
         if (playerPanelStateLink!=null) playerPanelStateLink.dispose();
         playerPanelStateLink = playerPanelState
             .subscribe(this.playerPanelState::onNext);

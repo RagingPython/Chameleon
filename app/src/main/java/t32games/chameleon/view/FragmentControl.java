@@ -6,7 +6,6 @@ import android.app.FragmentTransaction;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.subjects.PublishSubject;
 import t32games.chameleon.presenter.GameAction;
 import t32games.chameleon.presenter.MenuAction;
 import t32games.chameleon.presenter.NewAction;

@@ -104,7 +104,7 @@ public class ModelState implements SourceFieldState, SourcePlayerPanelState{
         affectedBlocks.add(currentBlock);
         currentBlock=new Block(color);
         for(Block b:affectedBlocks){
-            currentBlock.mergeWith(b,color);
+            currentBlock= currentBlock.mergeWith(b,color);
         }
         for (Pair<Block,Block> p:blockLinks){
             if (affectedBlocks.contains(p.getKey())) {
