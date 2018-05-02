@@ -126,7 +126,12 @@ public class ModelState implements SourceFieldState, SourcePlayerPanelState{
             newPlayer1Block=currentBlock;
         }
 
-        return new ModelState(xSize,ySize,numberOfColors, twoPlayers, twoPlayers ?1- turnOfPlayer : turnOfPlayer,newBlockLinks,newPlayer0Block,newPlayer1Block);
+        ModelState ans = new ModelState(xSize,ySize,numberOfColors, twoPlayers, twoPlayers ?1- turnOfPlayer : turnOfPlayer,newBlockLinks,newPlayer0Block,newPlayer1Block);
+        if (ans.getAllowedColors(ans.getTurnOfPlayer()).count().blockingGet()==0) {
+            ans = new ModelState(xSize,ySize,numberOfColors, twoPlayers, turnOfPlayer,newBlockLinks,newPlayer0Block,newPlayer1Block);
+        }
+
+        return ans;
     }
 
 
